@@ -1,15 +1,17 @@
-# Use Alpine-based builder to ensure compatibility with Prometheus image
-FROM alpine:latest as builder
-RUN apk add --no-cache gettext
+FROM debian:12-slim as builder
+# Install gettext-base which contains envsubst
+RUN apt-get update && apt-get install -y gettext-base
+# Create a statically linked version of envsubst for BusyBox compatibility
+RUN mkdir -p /build/lib
+COPY --from=busybox:latest /bin/busybox /build/
+RUN ldd /usr/bin/envsubst | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -v '{}' /build/lib/
 
-# Use the official Prometheus image (Alpine-based)
 FROM prom/prometheus:latest
-
-# Copy envsubst from the Alpine builder to the Prometheus image
-COPY --from=builder /usr/bin/envsubst /usr/bin/envsubst
-
-# Ensure the copied binary is executable
-RUN chmod +x /usr/bin/envsubst
-
-# Switch back to the non-root user (maintains security best practices)
+USER root
+# Copy the envsubst binary and its necessary libraries
+COPY --from=builder /usr/bin/envsubst /bin/envsubst
+COPY --from=builder /build/lib/* /lib/
+# Make envsubst executable
+RUN chmod +x /bin/envsubst
+# Switch back to the non-root user that Prometheus uses
 USER nobody
