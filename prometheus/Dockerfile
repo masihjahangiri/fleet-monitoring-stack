@@ -12,7 +12,7 @@ RUN mkdir -p /usr/lib
 # Copy binary and required libraries
 COPY --from=builder /usr/bin/envsubst /usr/bin/
 COPY --from=builder /usr/lib/libintl.so.8 /usr/lib/
-COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
+# COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
 
 # Verify binary functionality
 RUN envsubst --version
