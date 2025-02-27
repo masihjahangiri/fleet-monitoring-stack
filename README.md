@@ -2,7 +2,7 @@
 
 A complete monitoring solution for managing multiple server nodes using **Node Exporter**, **Prometheus**, **Grafana**, and **Alertmanager**. This setup collects metrics from server nodes with Node Exporter, visualizes them using Grafana, and sends alerts through Alertmanager, all managed centrally from one server.
 
----
+
 
 ## Overview
 
@@ -13,7 +13,7 @@ This repository provides a centralized monitoring stack to observe and manage a 
 - **Grafana:** Beautiful and customizable dashboards for data visualization.
 - **Alertmanager:** Configurable alerts for important metrics and incidents.
 
----
+
 
 ## Features
 
