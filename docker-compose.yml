@@ -15,7 +15,7 @@ services:
       - /bin/sh
       - -c
       - |
-        apt-get update && apt-get install -y gettext-base && \
+        apk add --no-cache gettext && \
         envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
         prometheus \
           --config.file=/etc/prometheus/prometheus.yml \
