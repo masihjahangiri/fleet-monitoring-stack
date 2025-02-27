@@ -5,6 +5,9 @@ RUN apk add --no-cache gettext
 # Use the official Prometheus image (Alpine-based)
 FROM prom/prometheus:latest
 
+# Switch to root to perform privileged operations
+USER root
+
 # Copy envsubst from the Alpine builder to the Prometheus image
 COPY --from=builder /usr/bin/envsubst /usr/bin/envsubst
 
