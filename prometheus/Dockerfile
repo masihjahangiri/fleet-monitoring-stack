@@ -10,12 +10,24 @@ USER root
 # Install minimum libc components
 RUN mkdir -p /usr/lib /lib
 
-# Copy envsubst and detect musl library path
+# Copy envsubst and required libraries
 COPY --from=builder /usr/bin/envsubst /usr/bin/
 COPY --from=builder /usr/lib/libintl.so.8 /usr/lib/
-COPY --from=builder $(ldd /usr/bin/envsubst | grep 'musl' | awk '{print $3}') /lib/
+# Use a more reliable way to copy the musl library
+COPY --from=builder /lib/ld-musl-*.so.1 /lib/
 
 # Verify installation
 RUN envsubst --version
 
+# Create directories for Prometheus configuration
+RUN mkdir -p /etc/prometheus/rules
+
+# Copy Prometheus configuration files
+# Note: The actual files will be mounted as volumes from docker-compose
+
+# Set proper permissions
+RUN chown -R nobody:nobody /etc/prometheus /prometheus
+
 USER nobody
+
+# The entrypoint is defined in docker-compose.yml to allow for template substitution
