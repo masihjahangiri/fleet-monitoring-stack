@@ -1,18 +1,21 @@
-# Use Alpine-based builder to ensure compatibility with Prometheus image
+# Stage 1: Build compatible envsubst with libraries
 FROM alpine:latest as builder
 RUN apk add --no-cache gettext
 
-# Use the official Prometheus image (Alpine-based)
+# Stage 2: Target Prometheus image
 FROM prom/prometheus:latest
 
-# Switch to root to perform privileged operations
+# Create necessary directories and set permissions
 USER root
+RUN mkdir -p /usr/lib
 
-# Copy envsubst from the Alpine builder to the Prometheus image
-COPY --from=builder /usr/bin/envsubst /usr/bin/envsubst
+# Copy binary and required libraries
+COPY --from=builder /usr/bin/envsubst /usr/bin/
+COPY --from=builder /usr/lib/libintl.so.8 /usr/lib/
+COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
 
-# Ensure the copied binary is executable
-RUN chmod +x /usr/bin/envsubst
+# Verify binary functionality
+RUN envsubst --version
 
-# Switch back to the non-root user (maintains security best practices)
+# Maintain original security context
 USER nobody
