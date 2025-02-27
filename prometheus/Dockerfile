@@ -1,17 +1,21 @@
-FROM debian:12-slim as builder
-# Install gettext-base which contains envsubst
-RUN apt-get update && apt-get install -y gettext-base
-# Create a statically linked version of envsubst for BusyBox compatibility
-RUN mkdir -p /build/lib
-COPY --from=busybox:latest /bin/busybox /build/
-RUN ldd /usr/bin/envsubst | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -v '{}' /build/lib/
+# Stage 1: Build compatible envsubst with libraries
+FROM alpine:latest as builder
+RUN apk add --no-cache gettext
 
+# Stage 2: Target Prometheus image
 FROM prom/prometheus:latest
+
+# Create necessary directories and set permissions
 USER root
-# Copy the envsubst binary and its necessary libraries
-COPY --from=builder /usr/bin/envsubst /bin/envsubst
-COPY --from=builder /build/lib/* /lib/
-# Make envsubst executable
-RUN chmod +x /bin/envsubst
-# Switch back to the non-root user that Prometheus uses
+RUN mkdir -p /usr/lib
+
+# Copy binary and required libraries
+COPY --from=builder /usr/bin/envsubst /usr/bin/
+COPY --from=builder /usr/lib/libintl.so.8 /usr/lib/
+COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
+
+# Verify binary functionality
+RUN envsubst --version
+
+# Maintain original security context
 USER nobody
