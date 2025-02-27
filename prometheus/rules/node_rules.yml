@@ -1,0 +1,56 @@
+groups:
+- name: node_alerts
+  rules:
+  - alert: HighCPULoad
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU load on {{ $labels.instance }}"
+      description: "CPU load is above 80% for 5 minutes (current value: {{ $value }}%)"
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage on {{ $labels.instance }}"
+      description: "Memory usage is above 85% for 5 minutes (current value: {{ $value }}%)"
+
+  - alert: HighDiskUsage
+    expr: (node_filesystem_size_bytes{fstype=~"ext4|xfs"} - node_filesystem_free_bytes{fstype=~"ext4|xfs"}) / node_filesystem_size_bytes{fstype=~"ext4|xfs"} * 100 > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High disk usage on {{ $labels.instance }} mount {{ $labels.mountpoint }}"
+      description: "Disk usage is above 85% for 5 minutes (current value: {{ $value }}%)"
+
+  - alert: InstanceDown
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} has been down for more than 2 minutes"
+
+  - alert: HighNetworkTraffic
+    expr: rate(node_network_receive_bytes_total[5m]) + rate(node_network_transmit_bytes_total[5m]) > 10 * 1024 * 1024
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High network traffic on {{ $labels.instance }}"
+      description: "Network traffic is above 10MB/s for 5 minutes (current value: {{ $value | humanize }}B/s)"
+
+  - alert: Network95thPercentile
+    expr: quantile_over_time(0.95, rate(node_network_receive_bytes_total[5m])[1h:1m]) + quantile_over_time(0.95, rate(node_network_transmit_bytes_total[5m])[1h:1m]) > 50 * 1024 * 1024
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High 95th percentile bandwidth on {{ $labels.instance }}"
+      description: "95th percentile of network bandwidth is above 50MB/s for the last hour"
