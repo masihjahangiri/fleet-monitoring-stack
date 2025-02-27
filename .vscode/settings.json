@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "alertmanager",
-        "configurator"
+        "configurator",
+        "envsubst"
     ]
 }
