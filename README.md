@@ -32,7 +32,7 @@ A comprehensive monitoring solution for managing multiple server nodes using Pro
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/fleet-monitoring-stack
+git clone https://github.com/masihjahangiri/fleet-monitoring-stack.git
 cd fleet-monitoring-stack
 ```
 
