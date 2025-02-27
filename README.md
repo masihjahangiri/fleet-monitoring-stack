@@ -22,7 +22,5 @@ This repository provides a centralized monitoring stack to observe and manage a 
 - Pre-configured Grafana dashboards for instant visibility.
 - Alerting with customizable rules using Alertmanager.
 
----
 
-## Architecture
 
