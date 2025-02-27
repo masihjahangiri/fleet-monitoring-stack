@@ -8,6 +8,7 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus/prometheus.yml.template:/etc/prometheus/prometheus.yml.template
+      - ./prometheus/web-config.yml.template:/etc/prometheus/web-config.yml.template
       - ./prometheus/rules:/etc/prometheus/rules
       - prometheus_data:/prometheus
     environment:
@@ -17,11 +18,8 @@ services:
       - /bin/sh
       - -c
       - |
-        echo '--------------------------------->>>> /etc/prometheus/prometheus.yml.template' && \
-        cat /etc/prometheus/prometheus.yml.template && \
         envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
-        echo '--------------------------------->>>> /etc/prometheus/prometheus.yml' && \
-        cat /etc/prometheus/prometheus.yml && \
+        envsubst < /etc/prometheus/web-config.yml.template > /etc/prometheus/web-config.yml && \
         prometheus \
           --config.file=/etc/prometheus/prometheus.yml \
           --storage.tsdb.path=/prometheus \
