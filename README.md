@@ -55,7 +55,7 @@ GRAFANA_PERSIST_PATH=/path/to/grafana/data
 
 5. Start the monitoring stack:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ## 🔧 Configuration
