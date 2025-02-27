@@ -10,7 +10,7 @@ services:
       - ./prometheus/rules:/etc/prometheus/rules
       - prometheus_data:/prometheus
     environment:
-      - HASHED_PASSWORD=${PROM_PASSWORD}
+      - HASHED_PASSWORD=${PROM_HASHED_PASSWORD}
       - NODE_EXPORTER_TARGETS=${NODE_EXPORTER_TARGETS}
     entrypoint:
       - /bin/sh
@@ -58,6 +58,9 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_DOMAIN=localhost
       - GF_SMTP_ENABLED=false
+      - PROMETHEUS_URL=http://prometheus:9090
+      - PROMETHEUS_USER=admin
+      - PROMETHEUS_PASSWORD=${PROM_PASSWORD}
     ports:
       - "3000:3000"
     restart: unless-stopped

@@ -4,6 +4,10 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: "${PROMETHEUS_URL}"
+    basicAuth: true
+    basicAuthUser: "${PROMETHEUS_USER}"
+    secureJsonData:
+      basicAuthPassword: "${PROMETHEUS_PASSWORD}"
     isDefault: true
     editable: false
