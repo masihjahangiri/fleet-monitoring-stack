@@ -18,7 +18,9 @@ services:
       - -c
       - |
         envsubst --version && \
+        cat /etc/prometheus/prometheus.yml.template && \
         envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
+        cat /etc/prometheus/prometheus.yml && \
         prometheus \
           --config.file=/etc/prometheus/prometheus.yml \
           --storage.tsdb.path=/prometheus \
