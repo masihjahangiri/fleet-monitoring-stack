@@ -1,15 +1,15 @@
-FROM debian:12-slim as builder
-RUN apt-get update && apt-get install -y gettext-base
+# Use Alpine-based builder to ensure compatibility with Prometheus image
+FROM alpine:latest as builder
+RUN apk add --no-cache gettext
 
+# Use the official Prometheus image (Alpine-based)
 FROM prom/prometheus:latest
-USER root
-# Copy the binary to multiple locations to ensure it's found
-COPY --from=builder /usr/bin/envsubst /bin/envsubst
+
+# Copy envsubst from the Alpine builder to the Prometheus image
 COPY --from=builder /usr/bin/envsubst /usr/bin/envsubst
-COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
-# Make all copies executable
-RUN chmod +x /bin/envsubst /usr/bin/envsubst /usr/local/bin/envsubst
+# Ensure the copied binary is executable
+RUN chmod +x /usr/bin/envsubst
 
-# Switch back to the non-root user that Prometheus uses
+# Switch back to the non-root user (maintains security best practices)
 USER nobody
