@@ -17,10 +17,10 @@ services:
       - /bin/sh
       - -c
       - |
-        echo '--------------------------------\n\n\n\n\n\n /etc/prometheus/prometheus.yml.template' && \
+        echo '--------------------------------->>>> /etc/prometheus/prometheus.yml.template' && \
         cat /etc/prometheus/prometheus.yml.template && \
         envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
-        echo '--------------------------------\n\n\n\n\n\n /etc/prometheus/prometheus.yml' && \
+        echo '--------------------------------->>>> /etc/prometheus/prometheus.yml' && \
         cat /etc/prometheus/prometheus.yml && \
         prometheus \
           --config.file=/etc/prometheus/prometheus.yml \
