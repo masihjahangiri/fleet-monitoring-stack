@@ -12,6 +12,7 @@ services:
     environment:
       - HASHED_PASSWORD=${PROM_HASHED_PASSWORD}
       - NODE_EXPORTER_TARGETS=${NODE_EXPORTER_TARGETS}
+      - AWS_CLOUDWATCH_TARGETS=${AWS_CLOUDWATCH_TARGETS}
     entrypoint:
       - /bin/sh
       - -c
