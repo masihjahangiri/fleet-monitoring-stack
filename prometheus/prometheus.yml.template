@@ -29,7 +29,3 @@ scrape_configs:
         regex: '(.*):9100'
         target_label: instance
         replacement: '$1'
-  
-  - job_name: 'amazon_cloudwatch_metrics'
-    static_configs:
-      - targets: ${AWS_CLOUDWATCH_TARGETS}
