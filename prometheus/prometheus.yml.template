@@ -1,7 +1,7 @@
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-  scrape_timeout: 10s
+  scrape_interval: 5m  # Scrape every 5 minutes
+  evaluation_interval: 5m  # Evaluate rules every 5 minutes
+  scrape_timeout: 30s  # Adjusted timeout to ensure completion
 
 # Alertmanager configuration
 alerting:
@@ -17,11 +17,15 @@ rule_files:
 # A scrape configuration containing exactly one endpoint to scrape:
 scrape_configs:
   - job_name: 'prometheus'
+    scrape_interval: 5m  # Override global setting if needed
+    basic_auth:
+      username: "admin"
+      password: "${PASSWORD}"
     static_configs:
       - targets: ['localhost:9090']
 
   - job_name: 'node_exporter'
-    scrape_interval: 10s
+    scrape_interval: 5m  # Set scrape interval to 5 minutes
     static_configs:
       - targets: ${NODE_EXPORTER_TARGETS}
     relabel_configs:

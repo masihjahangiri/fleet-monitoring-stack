@@ -11,6 +11,7 @@ services:
       - prometheus_data:/prometheus
     environment:
       - HASHED_PASSWORD=${PROM_HASHED_PASSWORD}
+      - PASSWORD=${PROM_PASSWORD}
       - NODE_EXPORTER_TARGETS=${NODE_EXPORTER_TARGETS}
     entrypoint:
       - /bin/sh
