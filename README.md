@@ -27,6 +27,14 @@ A comprehensive monitoring solution for managing multiple server nodes using Pro
 - Telegram Bot (for alerts)
 - Sufficient disk space for metrics storage
 
+## 🚀 Node Exporter Installer
+
+One-liner to install Node Exporter on Ubuntu:
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh)
+```
+Automatically installs latest version, sets up systemd service, and configures firewall. Tested on Ubuntu 20.04/22.04/24.04.
+
 ## 🛠️ Installation
 
 1. Clone the repository:
@@ -58,7 +66,7 @@ GRAFANA_PERSIST_PATH=/path/to/grafana/data
 docker compose up -d
 ```
 
-## 🔧 Configuration
+## 📋 Configuration
 
 ### Prometheus
 - Default port: 9090
