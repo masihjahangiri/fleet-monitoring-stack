@@ -26,10 +26,8 @@ scrape_configs:
           label: '{{ .label }}'
 {{- end }}
     relabel_configs:
-      - source_labels: [__address__]
-        regex: '(.*):9100'
+      - source_labels: [label]
         target_label: instance
-        replacement: '$1'
 
   # - job_name: 'prometheus'
   #   scrape_interval: 1m
