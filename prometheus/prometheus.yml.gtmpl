@@ -22,14 +22,21 @@ scrape_configs:
 {{- $json := getenv "NODE_EXPORTER_TARGETS_JSON" | jsonArray }}
 {{- range $json }}
       - targets: ['{{ .host }}']
-        labels:
-          label: '{{ .label }}'
 {{- end }}
     relabel_configs:
+      # Preserve instance name without port
       - source_labels: [__address__]
         regex: '(.*):9100'
         target_label: instance
         replacement: '$1'
+
+{{- range $json }}
+      # Apply label based on exact address match
+      - source_labels: [__address__]
+        regex: '{{ .host }}'
+        target_label: label
+        replacement: '{{ .label }}'
+{{- end }}
 
   # - job_name: 'prometheus'
   #   scrape_interval: 1m
