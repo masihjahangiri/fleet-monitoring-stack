@@ -19,9 +19,6 @@ services:
       - /bin/sh
       - -c
       - |
-        # Convert NODE_EXPORTER_TARGETS into a proper YAML array
-        export NODE_EXPORTER_TARGETS_YAML=$(echo $NODE_EXPORTER_TARGETS | sed 's/,/", "/g' | sed 's/=.*"/"/g' | sed 's/=.*//' | sed 's/^/["/' | sed 's/$/"]/')
-        
         envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
         envsubst < /etc/prometheus/web-config.yml.template > /etc/prometheus/web-config.yml && \
         prometheus \
