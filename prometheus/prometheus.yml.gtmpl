@@ -16,6 +16,20 @@ rule_files:
 
 # A scrape configuration containing exactly one endpoint to scrape:
 scrape_configs:
+  - job_name: 'node_exporter'
+    scrape_interval: 1m
+    static_configs:
+{{- range (ds "env").NODE_EXPORTER_TARGETS_JSON | parseJSON }}
+      - targets: ['{{ .host }}']
+        labels:
+          label: '{{ .label }}'
+{{- end }}
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.*):9100'
+        target_label: instance
+        replacement: '$1'
+
   # - job_name: 'prometheus'
   #   scrape_interval: 1m
   #   basic_auth:
@@ -23,13 +37,3 @@ scrape_configs:
   #     password: "${PASSWORD}"
   #   static_configs:
   #     - targets: ['localhost:9090']
-
-  - job_name: 'node_exporter'
-    scrape_interval: 1m
-    static_configs:
-      - targets: ${NODE_EXPORTER_TARGETS}
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: '(.*):9100'
-        target_label: instance
-        replacement: '$1'

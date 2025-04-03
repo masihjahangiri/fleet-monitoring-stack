@@ -1,22 +1,26 @@
-# Stage 1: Build compatible components
 FROM --platform=$BUILDPLATFORM alpine:latest as builder
-RUN apk add --no-cache gettext
+RUN apk add --no-cache gettext curl
 
-# Stage 2: Target Prometheus image
+ARG TARGETARCH
+RUN GOMPLATE_ARCH=$TARGETARCH && \
+    case "$GOMPLATE_ARCH" in \
+      amd64) GOMPLATE_ARCH=amd64 ;; \
+      arm64) GOMPLATE_ARCH=arm64 ;; \
+    esac && \
+    curl -sSL "https://github.com/hairyhenderson/gomplate/releases/latest/download/gomplate_linux-$GOMPLATE_ARCH" -o /usr/bin/gomplate && \
+    chmod +x /usr/bin/gomplate
+
 FROM prom/prometheus:latest
 
 USER root
 
-# Install minimum libc components
 RUN mkdir -p /usr/lib /lib
 
-# Copy envsubst and required libraries
 COPY --from=builder /usr/bin/envsubst /usr/bin/
+COPY --from=builder /usr/bin/gomplate /usr/bin/
 COPY --from=builder /usr/lib/libintl.so.8 /usr/lib/
 COPY --from=builder /lib/ld-musl-*.so.1 /lib/
 
-# Verify installation
-RUN envsubst --version
+RUN envsubst --version && gomplate --version
 
-# Maintain original security context
 USER nobody

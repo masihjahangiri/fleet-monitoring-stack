@@ -2,10 +2,19 @@
     "cSpell.words": [
         "alertmanager",
         "configurator",
-        "envsubst"
+        "envsubst",
+        "gomplate",
+        "gotmpl",
+        "gtmpl"
     ],
     "files.associations": {
+        "*.yml.gtmpl": "yaml",
+        "*.yaml.gtmpl": "yaml",
         "*.yml.template": "yaml",
         "*.yaml.template": "yaml"
-    }
+    },
+    "yaml.validate": false,
+    "yaml.customTags": [
+        "!reference sequence"
+    ]
 }

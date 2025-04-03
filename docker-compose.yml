@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: prometheus
     volumes:
-      - ./prometheus/prometheus.yml.template:/etc/prometheus/prometheus.yml.template
+      - ./prometheus/prometheus.yml.gtmpl:/etc/prometheus/prometheus.yml.gtmpl
       - ./prometheus/web-config.yml.template:/etc/prometheus/web-config.yml.template
       - ./prometheus/rules:/etc/prometheus/rules
       - prometheus_data:/prometheus
@@ -14,12 +14,12 @@ services:
     environment:
       - HASHED_PASSWORD=${PROM_HASHED_PASSWORD}
       - PASSWORD=${PROM_PASSWORD}
-      - NODE_EXPORTER_TARGETS=${NODE_EXPORTER_TARGETS}
+      - NODE_EXPORTER_TARGETS_JSON=${NODE_EXPORTER_TARGETS_JSON}
     entrypoint:
       - /bin/sh
       - -c
       - |
-        envsubst < /etc/prometheus/prometheus.yml.template > /etc/prometheus/prometheus.yml && \
+        gomplate -f /etc/prometheus/prometheus.yml.gtmpl -o /etc/prometheus/prometheus.yml && \
         envsubst < /etc/prometheus/web-config.yml.template > /etc/prometheus/web-config.yml && \
         prometheus \
           --config.file=/etc/prometheus/prometheus.yml \
