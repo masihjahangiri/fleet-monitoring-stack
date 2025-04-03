@@ -8,8 +8,7 @@ RUN GOMPLATE_ARCH=$TARGETARCH && \
       arm64) GOMPLATE_ARCH=arm64 ;; \
     esac && \
     curl -sSL "https://github.com/hairyhenderson/gomplate/releases/latest/download/gomplate_linux-$GOMPLATE_ARCH" -o /usr/bin/gomplate && \
-    chmod +x /usr/bin/gomplate && \
-    gomplate --version
+    chmod +x /usr/bin/gomplate
 
 FROM prom/prometheus:latest
 
