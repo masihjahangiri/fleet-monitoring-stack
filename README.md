@@ -105,11 +105,8 @@ This command will:
 When you make changes to the `.env` file (e.g., adding new hosts to `NODE_EXPORTER_TARGETS`), you need to restart the affected containers to apply the changes:
 
 ```bash
-# Restart specific services
-docker compose restart prometheus alertmanager
+git pull && docker compose down -v && docker compose up -d
 
-# Or restart all services
-docker compose restart
 ```
 
 Note: Some changes might require a full rebuild of the containers. In such cases, use the full update command shown above.
