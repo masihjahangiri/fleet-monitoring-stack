@@ -29,7 +29,7 @@ A comprehensive monitoring solution for managing multiple server nodes using Pro
 
 ## 🚀 Node Exporter Installer
 
-One-liner to install Node Exporter on Ubuntu:
+One-liner to install Node Exporter on Ubuntu nodes:
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh)
 ```
@@ -44,27 +44,61 @@ git clone https://github.com/masihjahangiri/fleet-monitoring-stack.git
 cd fleet-monitoring-stack
 ```
 
-2. Create environment variables file:
+2. Install Node Exporter on the current server (for local monitoring via host.docker.internal:9100):
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh)
+```
+
+3. Create environment variables file:
 ```bash
 cp .env.example .env
 ```
 
-3. Configure the environment variables:
+4. Configure the environment variables:
 ```bash
 # Edit .env file with your settings
-PROM_PASSWORD=your_hashed_password
-GF_SECURITY_ADMIN_PASSWORD=your_grafana_password
+
+# Prometheus Configuration
+PROM_PASSWORD=your_secure_password
+# Generate hashed password using https://bcrypt.online/
+PROM_HASHED_PASSWORD="your_hashed_password"
+# List of Node Exporter targets to monitor
+NODE_EXPORTER_TARGETS="['host.docker.internal:9100', 'server1:9100', 'server2:9100']"
+# Path to store Prometheus data
 PROMETHEUS_PERSIST_PATH=/path/to/prometheus/data
-ALERTMANAGER_PERSIST_PATH=/path/to/alertmanager/data
+
+# Grafana Configuration
+GF_SECURITY_ADMIN_PASSWORD=your_secure_password
+# Path to store Grafana data
 GRAFANA_PERSIST_PATH=/path/to/grafana/data
+
+# Alertmanager Configuration
+ALERTMANAGER_PASSWORD=your_secure_password
+# Path to store Alertmanager data
+ALERTMANAGER_PERSIST_PATH=/path/to/alertmanager/data
 ```
 
-4. Configure your server nodes in `prometheus/prometheus.yml`
+5. Configure your server nodes in `prometheus/prometheus.yml`
 
-5. Start the monitoring stack:
+6. Start the monitoring stack:
 ```bash
 docker compose up -d
 ```
+
+## 🔄 Updating the Stack
+
+To update the monitoring stack with the latest changes:
+
+```bash
+git pull && docker compose down -v && docker compose build --no-cache && docker compose up -d && docker compose logs -f
+```
+
+This command will:
+1. Pull the latest changes
+2. Stop and remove all containers and volumes
+3. Rebuild all images from scratch
+4. Start the stack in detached mode
+5. Follow the logs
 
 ## 📋 Configuration
 
