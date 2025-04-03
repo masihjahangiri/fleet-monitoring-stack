@@ -3,5 +3,9 @@
         "alertmanager",
         "configurator",
         "envsubst"
-    ]
+    ],
+    "files.associations": {
+        "*.yml.template": "yaml",
+        "*.yaml.template": "yaml"
+    }
 }
