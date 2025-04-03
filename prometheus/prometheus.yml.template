@@ -33,3 +33,7 @@ scrape_configs:
         regex: '(.*):9100'
         target_label: instance
         replacement: '$1'
+      - source_labels: [__meta_json_label]
+        target_label: name
+        regex: (.+)
+        replacement: '$1'
