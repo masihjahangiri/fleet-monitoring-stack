@@ -38,8 +38,6 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
-    networks:
-      - monitoring
 
   alertmanager:
     image: prom/alertmanager:latest
@@ -53,8 +51,6 @@ services:
     ports:
       - "9093:9093"
     restart: unless-stopped
-    networks:
-      - monitoring
 
   grafana:
     image: grafana/grafana:latest
@@ -73,14 +69,9 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
-    networks:
-      - monitoring
     depends_on:
       - prometheus
 
-networks:
-  monitoring:
-    driver: bridge
 
 volumes:
   prometheus_data:
