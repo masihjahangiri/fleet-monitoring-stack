@@ -1,178 +1,89 @@
 # Fleet Monitoring Stack
 
-A comprehensive monitoring solution for managing multiple server nodes using Prometheus, Grafana, Node Exporter, and Alertmanager. This stack provides real-time monitoring, visualization, and alerting capabilities for your server fleet.
+Production-ready monitoring solution for managing multiple server nodes. Collects system metrics via Node Exporter, stores and queries with Prometheus, visualizes in Grafana, and alerts through Alertmanager with Telegram integration.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+Built for self-managed infrastructure where you need full observability without relying on managed cloud monitoring services.
 
-## 🚀 Features
+## Architecture
 
-- **Centralized Monitoring:** Monitor multiple servers from a single dashboard
-- **Real-time Metrics:** Collect system-level metrics including CPU, memory, disk, and network
-- **Beautiful Dashboards:** Pre-configured Grafana dashboards for instant visualization
-- **Smart Alerting:** Configurable alerts via Telegram with different severity levels
-- **High Availability:** Reliable monitoring with automatic recovery
-- **Secure Access:** Basic authentication for Prometheus and Grafana interfaces
-
-## 🏗️ Architecture
-
-- **Node Exporter:** Collects system metrics from each server node
-- **Prometheus:** Central metrics collection and storage
-- **Grafana:** Data visualization and dashboarding
-- **Alertmanager:** Alert handling and notifications
-
-## 📋 Prerequisites
-
-- Docker and Docker Compose
-- Linux-based servers for monitoring
-- Telegram Bot (for alerts)
-- Sufficient disk space for metrics storage
-
-## 🚀 Node Exporter Installer
-
-One-liner to install Node Exporter on Ubuntu nodes:
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh)
 ```
-Automatically installs latest version, sets up systemd service, and configures firewall. Tested on Ubuntu 20.04/22.04/24.04.
+Server Nodes (Node Exporter :9100)
+        |
+        v
+  Prometheus (:9090)  -->  Alertmanager (:9093)  -->  Telegram
+        |
+        v
+   Grafana (:3000)
+```
 
-## 🛠️ Installation
+## What's Included
 
-1. Clone the repository:
+- **Prometheus** -- Metric collection with dynamic target configuration via environment variables. Basic auth enabled. Custom build with gomplate templating for target injection.
+- **Grafana** -- Pre-configured Node Exporter dashboard. Prometheus datasource auto-provisioned.
+- **Alertmanager** -- Telegram notifications for critical alerts. Basic auth enabled.
+- **Node Exporter installer** -- One-liner script to deploy Node Exporter on target servers as a systemd service.
+
+## Pre-configured Alerts
+
+| Alert | Condition | Severity |
+|---|---|---|
+| Instance Down | Target unreachable for 1m | Critical |
+| High CPU | >80% for 2m | Warning |
+| High Memory | >85% for 2m | Warning |
+| High Disk Usage | >85% | Warning |
+| High Network Traffic | >10MB/s for 5m | Warning |
+
+## Quick Start
+
+1. Clone the repo and copy the environment file:
 
 ```bash
 git clone https://github.com/masihjahangiri/fleet-monitoring-stack.git
 cd fleet-monitoring-stack
+cp example.env .env
 ```
 
-2. Install Node Exporter on the current server (for local monitoring via host.docker.internal:9100):
+2. Configure `.env` with your targets and credentials:
+
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh)
+NODE_EXPORTER_TARGETS_JSON='[{"host":"server1:9100","label":"web-01"},{"host":"server2:9100","label":"db-01"}]'
+PROM_PASSWORD=your-prometheus-password
+GF_SECURITY_ADMIN_PASSWORD=your-grafana-password
 ```
 
-3. Create environment variables file:
+3. Install Node Exporter on each target server:
+
 ```bash
-cp .env.example .env
+curl -fsSL https://raw.githubusercontent.com/masihjahangiri/node-exporter-installer/main/install.sh | sudo bash
 ```
 
-4. Configure the environment variables:
-```bash
-# Edit .env file with your settings
+4. Start the stack:
 
-# Prometheus Configuration
-PROM_PASSWORD=your_secure_password
-# Generate hashed password using https://bcrypt.online/
-PROM_HASHED_PASSWORD="your_hashed_password"
-# List of Node Exporter targets to monitor
-NODE_EXPORTER_TARGETS="['host.docker.internal:9100', 'server1:9100', 'server2:9100']"
-# Path to store Prometheus data
-PROMETHEUS_PERSIST_PATH=/path/to/prometheus/data
-
-# Grafana Configuration
-GF_SECURITY_ADMIN_PASSWORD=your_secure_password
-# Path to store Grafana data
-GRAFANA_PERSIST_PATH=/path/to/grafana/data
-
-# Alertmanager Configuration
-ALERTMANAGER_PASSWORD=your_secure_password
-# Path to store Alertmanager data
-ALERTMANAGER_PERSIST_PATH=/path/to/alertmanager/data
-```
-
-5. Configure your server nodes in `prometheus/prometheus.yml`
-
-6. Start the monitoring stack:
 ```bash
 docker compose up -d
 ```
 
-## 🔄 Updating the Stack
+5. Access Grafana at `http://your-server:3000`.
 
-To update the monitoring stack with the latest changes:
+## Configuration
 
-```bash
-git pull && docker compose down -v && docker compose build --no-cache && docker compose up -d && docker compose logs -f
-```
+All configuration is via environment variables in `.env`. See `example.env` for the full list.
 
-This command will:
-1. Pull the latest changes
-2. Stop and remove all containers and volumes
-3. Rebuild all images from scratch
-4. Start the stack in detached mode
-5. Follow the logs
+| Variable | Description |
+|---|---|
+| `NODE_EXPORTER_TARGETS_JSON` | JSON array of `{host, label}` objects for Prometheus targets |
+| `PROM_PASSWORD` / `PROM_HASHED_PASSWORD` | Prometheus basic auth credentials |
+| `GF_SECURITY_ADMIN_PASSWORD` | Grafana admin password |
+| `PROMETHEUS_PERSIST_PATH` | Host path for Prometheus data persistence |
+| `GRAFANA_PERSIST_PATH` | Host path for Grafana data persistence |
+| `ALERTMANAGER_PERSIST_PATH` | Host path for Alertmanager data persistence |
+| `NETWORK_NAME` | Docker network name |
 
-### Updating Environment Variables
+## Requirements
 
-When you make changes to the `.env` file (e.g., adding new hosts to `NODE_EXPORTER_TARGETS`), you need to restart the affected containers to apply the changes:
+- Docker and Docker Compose
+- Ubuntu 20.04+ on target servers (for Node Exporter installer)
 
-```bash
-git pull && docker compose down -v && docker compose up -d
+## License
 
-```
-
-Note: Some changes might require a full rebuild of the containers. In such cases, use the full update command shown above.
-
-## 📋 Configuration
-
-### Prometheus
-- Default port: 9090
-- Configuration file: `prometheus/prometheus.yml`
-- Alert rules: `prometheus/rules/node_rules.yml`
-
-### Grafana
-- Default port: 3000
-- Default username: admin
-- Password: Set via environment variable
-- Datasources: Auto-configured for Prometheus
-- Dashboards: Automatically provisioned
-
-### Alertmanager
-- Default port: 9093
-- Configuration: `alertmanager/alertmanager.yml`
-- Supports Telegram notifications
-- Configurable alert routing and grouping
-
-## 🚨 Alert Rules
-
-Pre-configured alerts include:
-- High CPU Usage (>80%)
-- High Memory Usage (>85%)
-- High Disk Usage (>85%)
-- Instance Down
-- High Network Traffic (>10MB/s)
-- Network 95th Percentile (>50MB/s)
-
-## 📊 Metrics Collection
-
-Node Exporter collects various system metrics including:
-- CPU utilization
-- Memory usage
-- Disk I/O
-- Network traffic
-- System load
-- File system usage
-
-## 🔐 Security
-
-- Basic authentication enabled for Prometheus
-- Grafana authentication required
-- Internal Docker network for components
-- Configurable access controls
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📧 Support
-
-For support, please open an issue in the GitHub repository.
-
-## ⭐ Show Your Support
-
-Give a ⭐️ if this project helped you!
-
-
-
+MIT
